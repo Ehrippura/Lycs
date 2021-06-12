@@ -13,7 +13,6 @@ import WebKit
 struct WebView: NSViewRepresentable {
 
     @Binding var searchText: String
-    @Binding var shouldUpdateSearchText: Bool
     @Binding var lyrics: String?
 
     class Coordinate: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
@@ -69,10 +68,7 @@ struct WebView: NSViewRepresentable {
             return
         }
 
-        if shouldUpdateSearchText {
-            shouldUpdateSearchText = false
-            nsView.load(URLRequest(url: url))
-        }
+        nsView.load(URLRequest(url: url))
     }
 
     static func dismantleNSView(_ nsView: WKWebView, coordinator: Coordinate) {
@@ -88,7 +84,7 @@ struct WebView: NSViewRepresentable {
 
 struct WebView_Previews: PreviewProvider {
     static var previews: some View {
-        WebView(searchText: .constant("https://www.google.com"), shouldUpdateSearchText: .constant(true), lyrics: .constant("hello world"))
+        WebView(searchText: .constant("https://www.google.com"), lyrics: .constant("hello world"))
     }
 }
 

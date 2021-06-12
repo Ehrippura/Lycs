@@ -13,8 +13,6 @@ class SearchModel: NSObject, ObservableObject {
 
     @Published var searchText: String = "https://"
 
-    @Published var shouldUpdate: Bool = false
-
     @Published var lyrics: String?
 
     private var converter = Converter()

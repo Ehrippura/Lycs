@@ -10,25 +10,34 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @EnvironmentObject var searchModel: SearchModel
+    @StateObject var searchModel = SearchModel()
+
+    @State var url: String = "https://petitlyrics.com/lyrics/"
 
     var body: some View {
         VStack {
             HStack {
-                TextField("Search", text: $searchModel.searchText)
+                TextField("Search", text: $url, onCommit:  {
+                    self.searchModel.searchText = url
+                })
 
                 Button(action: {
-                    self.searchModel.shouldUpdate = true
+                    self.searchModel.searchText = url
                 }, label: {
                     Text("Search")
                 })
 
             }.padding()
 
-            HStack {
+            ZStack {
                 WebView(searchText: $searchModel.searchText,
-                        shouldUpdateSearchText: $searchModel.shouldUpdate,
                         lyrics: $searchModel.lyrics)
+                Rectangle()
+                    .fill(Color(NSColor.windowBackgroundColor))
+            }
+            .frame(height: 2)
+
+            HStack {
 
                 VStack {
                     ScrollView {
