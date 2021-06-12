@@ -17,7 +17,7 @@ struct WebView: NSViewRepresentable {
 
     class Coordinate: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
 
-        var lyrics: Binding<String?>
+        var parent: WebView
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
@@ -29,7 +29,7 @@ struct WebView: NSViewRepresentable {
                     let response = try? JSONDecoder().decode([LyricsResponse].self, from: data) {
 
                     let lys = Converter.convert(lyrics: response)
-                    self.lyrics.wrappedValue = lys
+                    parent.lyrics = lys
                 }
             }
         }
@@ -39,8 +39,8 @@ struct WebView: NSViewRepresentable {
             decisionHandler(navigationAction.request.url?.host == "petitlyrics.com" ? .allow : .cancel)
         }
 
-        init(lyrics: Binding<String?>) {
-            self.lyrics = lyrics
+        init(parent: WebView) {
+            self.parent = parent
             super.init()
         }
     }
@@ -59,7 +59,7 @@ struct WebView: NSViewRepresentable {
 
     func makeCoordinator() -> Coordinate {
 
-        return Coordinate(lyrics: $lyrics)
+        return Coordinate(parent: self)
     }
 
     func updateNSView(_ nsView: WKWebView, context: Context) {
