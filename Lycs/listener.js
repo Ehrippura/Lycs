@@ -1,5 +1,6 @@
 
 var open = XMLHttpRequest.prototype.open;
+
 XMLHttpRequest.prototype.open = function() {
     this.addEventListener("load", function() {
         if (this.responseURL.includes("get_lyrics.ajax")) {

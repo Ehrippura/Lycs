@@ -1,18 +1,20 @@
 //
-//  ContentView.swift
+//  SearchView.swift
 //  Lycs
 //
-//  Created by wayne lin on 2020/6/26.
-//  Copyright © 2020 wayne lin. All rights reserved.
+//  Created byTzu-Yi Lin on 2021/8/12.
+//  Copyright © 2021Tzu-Yi Lin. All rights reserved.
 //
 
 import SwiftUI
 
-struct ContentView: View {
-
-    @StateObject var searchModel = SearchModel()
+struct SearchView: View {
+    
+    @ObservedObject var searchModel: SearchModel
 
     @State var url: String = "https://petitlyrics.com/lyrics/"
+
+    @State var isSearching: Bool = false
 
     var body: some View {
         VStack {
@@ -21,17 +23,22 @@ struct ContentView: View {
                     self.searchModel.searchText = url
                 })
 
-                Button(action: {
+                Button("Search") {
                     self.searchModel.searchText = url
-                }, label: {
-                    Text("Search")
-                })
+                    self.isSearching = true
+                }
+
+                if isSearching {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                }
 
             }.padding()
 
             ZStack {
                 WebView(searchText: $searchModel.searchText,
-                        lyrics: $searchModel.lyrics)
+                        item: $searchModel.item,
+                        isLoading: $isSearching)
                 Rectangle()
                     .fill(Color(NSColor.windowBackgroundColor))
             }
@@ -41,26 +48,25 @@ struct ContentView: View {
 
                 VStack {
                     ScrollView {
-                        Text(searchModel.lyrics ?? "")
+                        Text(searchModel.item?.lyrics ?? "")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    Button(action: {
-                        guard let text = self.searchModel.lyrics else { return }
+
+                    Button("Copy to Pasteboard") {
+                        guard let text = self.searchModel.item?.lyrics else { return }
                         let pastboard = NSPasteboard.general
                         pastboard.clearContents()
                         pastboard.setString(text, forType: .string)
-                    }, label: {
-                        Text("Copy to Pasteboard")
-                    }).frame(maxHeight: 44)
+                    }
+                    .frame(maxHeight: 44)
                 }
             }
         }
     }
 }
 
-
-struct ContentView_Previews: PreviewProvider {
+struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        SearchView(searchModel: SearchModel())
     }
 }
