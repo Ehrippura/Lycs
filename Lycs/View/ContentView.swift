@@ -15,6 +15,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             HistoryView(items: $model.histories, selection: $model.selectedHistory)
+                .frame(minWidth: 200.0)
             SearchView(searchModel: model)
         }
         .navigationTitle(model.item?.title ?? "petitlyrics.com")

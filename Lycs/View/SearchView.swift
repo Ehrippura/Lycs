@@ -17,49 +17,52 @@ struct SearchView: View {
     @State var isSearching: Bool = false
 
     var body: some View {
-        VStack {
-            HStack {
-                TextField("Search", text: $url, onCommit:  {
-                    self.searchModel.searchText = url
-                })
 
-                Button("Search") {
-                    self.searchModel.searchText = url
-                    self.isSearching = true
-                }
+        ZStack {
+            WebView(searchText: $searchModel.searchText,
+                    item: $searchModel.item,
+                    isLoading: $isSearching)
+                .frame(height: 1.0)
 
-                if isSearching {
-                    ProgressView()
-                        .scaleEffect(0.5)
-                }
+            VStack {
+                HStack {
+                    TextField("Search", text: $url, onCommit:  {
+                        self.searchModel.searchText = url
+                    })
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
-            }.padding()
+                    Button("Search") {
+                        self.searchModel.searchText = url
+                        self.isSearching = true
+                    }
 
-            ZStack {
-                WebView(searchText: $searchModel.searchText,
-                        item: $searchModel.item,
-                        isLoading: $isSearching)
-                Rectangle()
-                    .fill(Color(NSColor.windowBackgroundColor))
-            }
-            .frame(height: 2)
+                }.padding()
 
-            HStack {
-
-                VStack {
+                ZStack {
                     ScrollView {
                         Text(searchModel.item?.lyrics ?? "")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    .contextMenu(menuItems: {
+                        Button("Copy to Pasteboard") {
+                            guard let text = self.searchModel.item?.lyrics else { return }
+                            let pastboard = NSPasteboard.general
+                            pastboard.clearContents()
+                            pastboard.setString(text, forType: .string)
+                        }
+                    })
 
-                    Button("Copy to Pasteboard") {
-                        guard let text = self.searchModel.item?.lyrics else { return }
-                        let pastboard = NSPasteboard.general
-                        pastboard.clearContents()
-                        pastboard.setString(text, forType: .string)
+                    if isSearching {
+                        ProgressView()
                     }
-                    .frame(maxHeight: 44)
                 }
+            }
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+
+        .toolbar {
+            ToolbarItem {
+                Spacer()
             }
         }
     }
